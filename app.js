@@ -32,4 +32,14 @@ app.get("/blogs", function (req, res) {
     });
 });
 
+app.get("/blogs/:id", function (req, res) {
+    Blog.findById(req.params.id, function (err, foundBlog) {
+        if (err) {
+            res.redirect("/blogs");
+        } else {
+            res.render("show", {blog: foundBlog});
+        }
+    });
+});
+
 app.listen(process.env.PORT || 3000, process.env.IP);
