@@ -1,5 +1,12 @@
 <% include partials/header.ejs %>
 
-<h1>All Blogs fuckfuckfuck</h1>
+<% blogs.forEach(function (blog) { %>
+    <div>
+        <h2><% blog.title %></h2>
+        <img src="<% blog.image %>">
+        <span><% blog.created %></span>
+        <p><% blog.body %></p>
+    </div>
+<% }) %>
 
 <% include partials/footer.ejs %>
