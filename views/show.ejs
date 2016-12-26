@@ -1,7 +1,9 @@
 <% include partials/header.ejs %>
 
-<div>
-    <h2><%= blog.title %></h2>
-</div>
+<h2><%= blog.title %></h2>
+
+<img src="<%= blog.image %>">
+
+<p><%= blog.body %></p>
 
 <% include partials/footer.ejs %>

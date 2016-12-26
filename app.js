@@ -23,11 +23,11 @@ app.get("/", function (req, res) {
 });
 
 app.get("/blogs", function (req, res) {
-    Blog.find({}, function (err, blogs) {
+    Blog.find({}, function (err, allBlogs) {
         if (err) {
             console.log("ERROR!");
         } else {
-            res.render("index", {blogs: blogs});
+            res.render("index", {blogs: allBlogs});
         }
     });
 });

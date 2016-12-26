@@ -1,13 +1,19 @@
 <% include partials/header.ejs %>
 
-<% blogs.forEach(function (blog) { %>
-    <div>
-        <h2><%= blog.title %></h2>
-        <img src="<%= blog.image %>">
-        <span><%= blog.created %></span>
-        <p><%= blog.body %></p>
-        <a href="/blogs/<%= blog._id %>">Read More</a>
+<div class="container">
+    <div class="row text-center">
+        <% blogs.forEach(function (blog) { %>
+            <div>
+                <div class="thumbnail">
+                    <h2><%= blog.title %></h2>
+                    <img src="<%= blog.image %>">
+                    <span><%= blog.created %></span>
+                    <p><%= blog.body %></p>
+                    <a href="/blogs/<%= blog._id %>" class="btn btn-primary">Read More</a>
+                </div>
+            </div>
+        <% }); %>
     </div>
-<% }); %>
+</div>
 
 <% include partials/footer.ejs %>
