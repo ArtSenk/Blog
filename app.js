@@ -12,7 +12,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
-// MONGOOSE CONFIG
+// Mongoose config
 var blogSchema = new mongoose.Schema({
     title: String,
     image: String,
@@ -21,7 +21,7 @@ var blogSchema = new mongoose.Schema({
 });
 var Blog = mongoose.model("Blog", blogSchema);
 
-// PASSPORT CONFIGURATION
+// Passport configuration
 app.use(require("express-session")({
     secret: "Fucking secret",
     resave: false,
@@ -33,10 +33,17 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(function (req, res, next) {
+    res.locals.currentUser = req.user;
+    next();
+});
+
+// Start page
 app.get("/", function (req, res) {
     res.render("landing");
 });
 
+// Show all posts
 app.get("/blogs", function (req, res) {
     Blog.find({}, function (err, allBlogs) {
         if (err) {
@@ -47,6 +54,7 @@ app.get("/blogs", function (req, res) {
     });
 });
 
+// Shows more info about one post
 app.get("/blogs/:id", function (req, res) {
     Blog.findById(req.params.id, function (err, foundBlog) {
         if (err) {
@@ -57,11 +65,11 @@ app.get("/blogs/:id", function (req, res) {
     });
 });
 
-// show login form
+// Show login form
 app.get("/login", function (req, res) {
     res.render("login");
 });
-// handling login logic
+// Handling login logic
 app.post("/login", passport.authenticate("local",
     {
         successRedirect: "/blogs",
@@ -69,7 +77,7 @@ app.post("/login", passport.authenticate("local",
     }), function (req, res) {
 });
 
-// logic route
+// Logic route
 app.get("/logout", function (req, res) {
     req.logout();
     res.redirect("/blogs");
