@@ -5,13 +5,16 @@ var express       = require("express"),
     passport      = require("passport"),
     LocalStrategy = require("passport-local"),
     Post          = require("./models/post"),
-    User          = require("./models/usr");
+    Comment       = require("./models/comment"),
+    User          = require("./models/usr"),
+    seedDB        = require("./seeds");
 
 mongoose.connect(process.env.DATABASEURL);
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+seedDB();
 
 // Passport configuration
 app.use(require("express-session")({
@@ -39,9 +42,9 @@ app.get("/", function (req, res) {
 app.get("/posts", function (req, res) {
     Post.find({}, function (err, allPosts) {
         if (err) {
-            console.log("ERROR!");
+            console.log(err);
         } else {
-            res.render("index", {posts: allPosts});
+            res.render("posts/index", {posts: allPosts});
         }
     });
 });
@@ -62,16 +65,49 @@ app.post("/posts", function (req, res) {
 });
 
 app.get("/posts/new", function (req, res) {
-    res.render("new");
+    res.render("posts/new");
 });
 
 // Shows more info about one post
 app.get("/posts/:id", function (req, res) {
-    Post.findById(req.params.id, function (err, foundPost) {
+    Post.findById(req.params.id).populate("comments").exec(function (err, foundPost) {
         if (err) {
+            console.log(err);
+        } else {
+            console.log(foundPost);
+            res.render("posts/show", {post: foundPost});
+        }
+    });
+});
+
+// Comments Routes
+app.get("/posts/:id/comments/new", function (req, res) {
+    // Find post by id
+    Post.findById(req.params.id, function (err, post) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("comments/new", {post: post});
+        }
+    });
+});
+
+app.post("/posts/:id/comments", function (req, res) {
+    // Lookup campground using ID
+    Post.findById(req.params.id, function (err, post) {
+        if (err) {
+            console.log(err);
             res.redirect("/posts");
         } else {
-            res.render("show", {post: foundPost});
+            Comment.create(req.body.comment, function (err, comment) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    post.comments.push(comment);
+                    post.save();
+                    res.redirect('/posts/' + post._id);
+                }
+            });
         }
     });
 });
