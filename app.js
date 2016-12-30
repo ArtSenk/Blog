@@ -4,6 +4,7 @@ var express       = require("express"),
     mongoose      = require("mongoose"),
     passport      = require("passport"),
     LocalStrategy = require("passport-local"),
+    Post          = require("./models/post"),
     User          = require("./models/usr");
 
 mongoose.connect(process.env.DATABASEURL);
@@ -11,15 +12,6 @@ mongoose.connect(process.env.DATABASEURL);
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
-
-// Mongoose config
-var blogSchema = new mongoose.Schema({
-    title: String,
-    image: String,
-    body: String,
-    created: {type: Date, default: Date.now}
-});
-var Blog = mongoose.model("Blog", blogSchema);
 
 // Passport configuration
 app.use(require("express-session")({
@@ -44,23 +36,42 @@ app.get("/", function (req, res) {
 });
 
 // Show all posts
-app.get("/blogs", function (req, res) {
-    Blog.find({}, function (err, allBlogs) {
+app.get("/posts", function (req, res) {
+    Post.find({}, function (err, allPosts) {
         if (err) {
             console.log("ERROR!");
         } else {
-            res.render("index", {blogs: allBlogs});
+            res.render("index", {posts: allPosts});
         }
     });
 });
 
-// Shows more info about one post
-app.get("/blogs/:id", function (req, res) {
-    Blog.findById(req.params.id, function (err, foundBlog) {
+app.post("/posts", function (req, res) {
+    var name = req.body.name;
+    var image = req.body.image;
+    var desc = req.body.description;
+    var newPost = {name: name, image: image, description: desc};
+
+    Post.create(newPost, function (err, newlyCreated) {
         if (err) {
-            res.redirect("/blogs");
+            console.log(err);
         } else {
-            res.render("show", {blog: foundBlog});
+            res.redirect("/posts");
+        }
+    });
+});
+
+app.get("/posts/new", function (req, res) {
+    res.render("new");
+});
+
+// Shows more info about one post
+app.get("/posts/:id", function (req, res) {
+    Post.findById(req.params.id, function (err, foundPost) {
+        if (err) {
+            res.redirect("/posts");
+        } else {
+            res.render("show", {post: foundPost});
         }
     });
 });
@@ -72,7 +83,7 @@ app.get("/login", function (req, res) {
 // Handling login logic
 app.post("/login", passport.authenticate("local",
     {
-        successRedirect: "/blogs",
+        successRedirect: "/posts",
         failureRedirect: "/login"
     }), function (req, res) {
 });
@@ -80,7 +91,7 @@ app.post("/login", passport.authenticate("local",
 // Logic route
 app.get("/logout", function (req, res) {
     req.logout();
-    res.redirect("/blogs");
+    res.redirect("/posts");
 });
 
 app.listen(process.env.PORT || 3000, process.env.IP);
