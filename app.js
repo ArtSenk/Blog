@@ -14,7 +14,7 @@ mongoose.connect(process.env.DATABASEURL);
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
-seedDB();
+//seedDB();
 
 // Passport configuration
 app.use(require("express-session")({
@@ -81,7 +81,7 @@ app.get("/posts/:id", function (req, res) {
 });
 
 // Comments Routes
-app.get("/posts/:id/comments/new", function (req, res) {
+app.get("/posts/:id/comments/new", isLoggedIn, function (req, res) {
     // Find post by id
     Post.findById(req.params.id, function (err, post) {
         if (err) {
@@ -112,6 +112,24 @@ app.post("/posts/:id/comments", function (req, res) {
     });
 });
 
+// Show register form
+app.get("/register", function (req, res) {
+    res.render("register");
+});
+// Handling sign up logic
+app.post("/register", function (req, res) {
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, function (err, user) {
+        if (err) {
+            console.log(err);
+            return res.render("register");
+        }
+        passport.authenticate("local")(req, res, function () {
+            res.redirect("/posts");
+        });
+    });
+});
+
 // Show login form
 app.get("/login", function (req, res) {
     res.render("login");
@@ -129,5 +147,12 @@ app.get("/logout", function (req, res) {
     req.logout();
     res.redirect("/posts");
 });
+
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+}
 
 app.listen(process.env.PORT || 3000, process.env.IP);
