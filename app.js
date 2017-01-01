@@ -4,10 +4,13 @@ var express       = require("express"),
     mongoose      = require("mongoose"),
     passport      = require("passport"),
     LocalStrategy = require("passport-local"),
-    Post          = require("./models/post"),
-    Comment       = require("./models/comment"),
     User          = require("./models/usr"),
     seedDB        = require("./seeds");
+
+// requiring routes
+var postRoutes    = require("./routes/posts"),
+    commentRoutes = require("./routes/comments"),
+    indexRoutes   = require("./routes/index");
 
 mongoose.connect(process.env.DATABASEURL);
 
@@ -33,126 +36,8 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Start page
-app.get("/", function (req, res) {
-    res.render("landing");
-});
-
-// Show all posts
-app.get("/posts", function (req, res) {
-    Post.find({}, function (err, allPosts) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.render("posts/index", {posts: allPosts});
-        }
-    });
-});
-
-app.post("/posts", function (req, res) {
-    var name = req.body.name;
-    var image = req.body.image;
-    var desc = req.body.description;
-    var newPost = {name: name, image: image, description: desc};
-
-    Post.create(newPost, function (err, newlyCreated) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.redirect("/posts");
-        }
-    });
-});
-
-app.get("/posts/new", function (req, res) {
-    res.render("posts/new");
-});
-
-// Shows more info about one post
-app.get("/posts/:id", function (req, res) {
-    Post.findById(req.params.id).populate("comments").exec(function (err, foundPost) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(foundPost);
-            res.render("posts/show", {post: foundPost});
-        }
-    });
-});
-
-// Comments Routes
-app.get("/posts/:id/comments/new", isLoggedIn, function (req, res) {
-    // Find post by id
-    Post.findById(req.params.id, function (err, post) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.render("comments/new", {post: post});
-        }
-    });
-});
-
-app.post("/posts/:id/comments", function (req, res) {
-    // Lookup campground using ID
-    Post.findById(req.params.id, function (err, post) {
-        if (err) {
-            console.log(err);
-            res.redirect("/posts");
-        } else {
-            Comment.create(req.body.comment, function (err, comment) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    post.comments.push(comment);
-                    post.save();
-                    res.redirect('/posts/' + post._id);
-                }
-            });
-        }
-    });
-});
-
-// Show register form
-app.get("/register", function (req, res) {
-    res.render("register");
-});
-// Handling sign up logic
-app.post("/register", function (req, res) {
-    var newUser = new User({username: req.body.username});
-    User.register(newUser, req.body.password, function (err, user) {
-        if (err) {
-            console.log(err);
-            return res.render("register");
-        }
-        passport.authenticate("local")(req, res, function () {
-            res.redirect("/posts");
-        });
-    });
-});
-
-// Show login form
-app.get("/login", function (req, res) {
-    res.render("login");
-});
-// Handling login logic
-app.post("/login", passport.authenticate("local",
-    {
-        successRedirect: "/posts",
-        failureRedirect: "/login"
-    }), function (req, res) {
-});
-
-// Logic route
-app.get("/logout", function (req, res) {
-    req.logout();
-    res.redirect("/posts");
-});
-
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        return next();
-    }
-    res.redirect("/login");
-}
+app.use("/", indexRoutes);
+app.use("/posts", postRoutes);
+app.use("/posts/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT || 3000, process.env.IP);
