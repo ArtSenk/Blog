@@ -1,25 +1,36 @@
 <% include ../partials/header.ejs %>
 
-<h2><%= post.name %></h2>
-
-<img src="<%= post.image %>">
-
-<p><%= post.description %></p>
-
-<p>
-    <a class="btn btn-success" href="/posts/<%= post._id %>/comments/new">Add New Comment</a>
-</p>
-
-<% post.comments.forEach(function (comment) { %>
+<div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <strong><%= comment.author.username %></strong>
-            <span class="pull-right">10 days ago</span>
-            <p>
-                <%= comment.text %>
-            </p>
+        <div class="col-md-9">
+            <div class="thumbnail">
+                <img class="img-responsive" src="<%= post.image %>">
+                <div class="caption-full">
+                    <h4><a><%=post.name%></a></h4>
+                    <p><%= post.description %></p>
+                    <p>
+                        <em>Submitted By <%= post.author.username %></em>
+                    </p>
+                </div>
+            </div>
+            <div class="well">
+                <div class="text-right">
+                    <a class="btn btn-success" href="/posts/<%= post._id %>/comments/new">Add New Comment</a>
+                </div>
+                <hr>
+                <% post.comments.forEach(function (comment) { %>
+                <div class="row">
+                    <div class="col-md-12">
+                        <strong><%= comment.author.username %></strong>
+                        <p>
+                            <%= comment.text %>
+                        </p>
+                    </div>
+                </div>
+            <% }); %>
+                </div>
         </div>
     </div>
-<% }); %>
+</div>
 
 <% include ../partials/footer.ejs %>
