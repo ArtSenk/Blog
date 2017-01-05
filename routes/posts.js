@@ -78,6 +78,17 @@ router.put("/:id", function (req, res) {
     });
 });
 
+// DESTROY POST ROUTE
+router.delete("/:id", function (req, res) {
+    Post.findByIdAndRemove(req.params.id, function (err) {
+        if (err) {
+            res.redirect("/posts");
+        } else {
+            res.redirect("/posts");
+        }
+    });
+});
+
 // middleware
 function isLoggedIn(req, res, next){
     if (req.isAuthenticated()) {
