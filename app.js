@@ -1,11 +1,12 @@
-var express       = require("express"),
-    app           = express(),
-    bodyParser    = require("body-parser"),
-    mongoose      = require("mongoose"),
-    passport      = require("passport"),
-    LocalStrategy = require("passport-local"),
-    User          = require("./models/usr"),
-    seedDB        = require("./seeds");
+var express        = require("express"),
+    app            = express(),
+    bodyParser     = require("body-parser"),
+    mongoose       = require("mongoose"),
+    passport       = require("passport"),
+    LocalStrategy  = require("passport-local"),
+    methodOverride = require("method-override"),
+    User           = require("./models/usr"),
+    seedDB         = require("./seeds");
 
 // requiring routes
 var postRoutes    = require("./routes/posts"),
@@ -17,6 +18,7 @@ mongoose.connect(process.env.DATABASEURL);
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
 //seedDB();
 
 // Passport configuration
