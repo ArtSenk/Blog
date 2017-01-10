@@ -62,7 +62,7 @@ router.get("/:id/edit", checkPostOwnership, function (req, res) {
 });
 
 // UPDATE POST ROUTE
-router.put("/:id", function (req, res) {
+router.put("/:id", checkPostOwnership, function (req, res) {
     // find and update the current post
     Post.findByIdAndUpdate(req.params.id, req.body.post, function (err, updatePost) {
         if (err) {
@@ -75,7 +75,7 @@ router.put("/:id", function (req, res) {
 });
 
 // DESTROY POST ROUTE
-router.delete("/:id", function (req, res) {
+router.delete("/:id",checkPostOwnership, function (req, res) {
     Post.findByIdAndRemove(req.params.id, function (err) {
         if (err) {
             res.redirect("/posts");
