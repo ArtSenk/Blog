@@ -5,7 +5,8 @@ var User = require("../models/usr");
 
 // Start page
 router.get("/", function (req, res) {
-    res.render("landing");
+    //res.render("landing");
+    res.redirect("/posts");
 });
 
 // Show register form
@@ -40,9 +41,10 @@ router.post("/login", passport.authenticate("local",
     }), function (req, res) {
 });
 
-// Logic route
+// Logout route
 router.get("/logout", function (req, res) {
     req.logout();
+    req.flash("success", "Logged you out");
     res.redirect("/posts");
 });
 
