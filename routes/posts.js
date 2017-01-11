@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Post = require("../models/post");
+var middleware = require("../middleware/index");
 
 //INDEX - show all posts
 router.get("/", function (req, res) {
@@ -15,7 +16,7 @@ router.get("/", function (req, res) {
 });
 
 //CREATE - add new post to DB
-router.post("/", isLoggedIn, function (req, res) {
+router.post("/", middleware.isLoggedIn, function (req, res) {
     // get data from form and add to posts array
     var name = req.body.name;
     var image = req.body.image;
@@ -38,7 +39,7 @@ router.post("/", isLoggedIn, function (req, res) {
 });
 
 //NEW - show form to create new post
-router.get("/new", isLoggedIn, function (req, res) {
+router.get("/new", middleware.isLoggedIn, function (req, res) {
     res.render("posts/new");
 });
 
@@ -55,14 +56,14 @@ router.get("/:id", function (req, res) {
 });
 
 // EDIT POST ROUTE
-router.get("/:id/edit", checkPostOwnership, function (req, res) {
+router.get("/:id/edit", middleware.checkPostOwnership, function (req, res) {
     Post.findById(req.params.id, function (err, foundPost) {
         res.render("posts/edit", {post: foundPost});
     });
 });
 
 // UPDATE POST ROUTE
-router.put("/:id", checkPostOwnership, function (req, res) {
+router.put("/:id", middleware.checkPostOwnership, function (req, res) {
     // find and update the current post
     Post.findByIdAndUpdate(req.params.id, req.body.post, function (err, updatePost) {
         if (err) {
@@ -75,7 +76,7 @@ router.put("/:id", checkPostOwnership, function (req, res) {
 });
 
 // DESTROY POST ROUTE
-router.delete("/:id",checkPostOwnership, function (req, res) {
+router.delete("/:id", middleware.checkPostOwnership, function (req, res) {
     Post.findByIdAndRemove(req.params.id, function (err) {
         if (err) {
             res.redirect("/posts");
@@ -84,32 +85,5 @@ router.delete("/:id",checkPostOwnership, function (req, res) {
         }
     });
 });
-
-// middleware
-function isLoggedIn(req, res, next){
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
-
-function checkPostOwnership(req, res, next) {
-    if (req.isAuthenticated()) {
-        Post.findById(req.params.id, function (err, foundPost) {
-            if (err) {
-                res.redirect("back");
-            } else {
-                // does user own the post?
-                if (foundPost.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-            }
-        });
-    } else {
-        res.redirect("back");
-    }
-}
 
 module.exports = router;
