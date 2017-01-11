@@ -33,6 +33,9 @@
                         </p>
                         <a class="btn btn-xs btn-warning"
                            href="/posts/<%= post._id %>/comments/<%= comment._id %>/edit">Edit</a>
+                        <form id="delete-form" action="/posts/<%= post._id %>/comments/<%= comment._id %>?_method=DELETE" method="post">
+                            <input type="submit" class="btn btn-xs btn-danger" value="Delete">
+                        </form>
                     </div>
                 </div>
             <% }); %>
