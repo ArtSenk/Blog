@@ -7,7 +7,7 @@
                 <div class="thumbnail">
                     <h4><%= post.name %></h4>
                     <img src="<%= post.image %>">
-                    <span><%= post.created %></span>
+                    <span><%= post.created.toDateString() %></span>
                     <p><%= post.description %></p>
                     <p>
                         <a href="/posts/<%= post._id %>" class="btn btn-primary">Read More</a>
