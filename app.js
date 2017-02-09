@@ -35,6 +35,13 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// set "showTests" context property if the querystring contains test=1
+app.use(function (req, res, next) {
+    res.locals.showTests = app.get("env") !== "production" &&
+            req.query.test === "1";
+    next();
+});
+
 app.use(function (req, res, next) {
     res.locals.currentUser = req.user;
     res.locals.error = req.flash("error");
