@@ -4,6 +4,10 @@
     <title>Blog</title>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+    <% if (showTests) { %>
+        <link rel="stylesheet" type="text/css" href="/vendor/mocha.css">
+    <% } %>
+</head>
 <body>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -45,6 +49,18 @@
         </div>
     <% } %>
 </div>
+
+<% if (showTests) { %>
+    <div id="mocha"></div>
+    <script src="/vendor/mocha.js"></script>
+    <script src="/vendor/chai.js"></script>
+    <script>
+        mocha.ui("tdd");
+        var assert = chai.assert;
+    </script>
+    <script src="/qa/tests-global.js"></script>
+    <script>mocha.run();</script>
+<% } %>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
