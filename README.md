@@ -1,6 +1,5 @@
 ## Travel_Blog
-### Heroku
-The app is deployed here: http://fast-mesa-14311.herokuapp.com/
+
 ### For Start
 I use Linux Ubuntu 14.04
 
